@@ -2,8 +2,6 @@ package com.mdonerprojects.productservices.aggregate;
 
 import com.mdonerprojects.productservices.command.CreateProductCommand;
 import com.mdonerprojects.productservices.event.ProductCreatedEvent;
-import lombok.Builder;
-import lombok.Data;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -14,8 +12,6 @@ import org.springframework.beans.BeanUtils;
 import java.math.BigDecimal;
 
 @Aggregate
-@Data
-@Builder
 public class ProductAggregate {
     @AggregateIdentifier
     private String productId;
