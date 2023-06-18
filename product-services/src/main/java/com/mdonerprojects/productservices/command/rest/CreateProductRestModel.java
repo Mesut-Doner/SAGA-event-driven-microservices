@@ -1,4 +1,4 @@
-package com.mdonerprojects.productservices.rest;
+package com.mdonerprojects.productservices.command.rest;
 
 
 import lombok.Builder;
