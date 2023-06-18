@@ -25,8 +25,6 @@ I
 fproduct-services/src/test/java/com/mdonerprojects/productservices/ProductServicesApplicationTests.java,3\5\35e4d9189715393d2fb49fbae49753e590d93ccb
 Q
 !eureka-discovery-services/pom.xml,0\e\0ece3b729d8ea736c0b68e2f00ef0a3c6506c606
-H
-product-services/pom.xml,7\d\7d2cdc9ac46f63433e574078db2df1f797193c7e
 ‘
 aproduct-services/src/main/java/com/mdonerprojects/productservices/ProductServicesApplication.java,c\a\ca5757e1a29eacbdf9c4a163bb14c9cd0c23d163
 O
