@@ -25,8 +25,6 @@ I
 fproduct-services/src/test/java/com/mdonerprojects/productservices/ProductServicesApplicationTests.java,3\5\35e4d9189715393d2fb49fbae49753e590d93ccb
 Q
 !eureka-discovery-services/pom.xml,0\e\0ece3b729d8ea736c0b68e2f00ef0a3c6506c606
-‘
-aproduct-services/src/main/java/com/mdonerprojects/productservices/ProductServicesApplication.java,c\a\ca5757e1a29eacbdf9c4a163bb14c9cd0c23d163
 O
 api-gateway-services/.gitignore,b\8\b83b3d61a6e995821db3c3be30a7b5e08def413e
  

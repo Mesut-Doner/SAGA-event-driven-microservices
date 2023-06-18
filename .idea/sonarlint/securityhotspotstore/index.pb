@@ -27,8 +27,6 @@ Q
 !eureka-discovery-services/pom.xml,0\e\0ece3b729d8ea736c0b68e2f00ef0a3c6506c606
 ª
 zeureka-discovery-services/src/main/java/com/mdonerprojects/eurekadiscoveryservices/EurekaDiscoveryServicesApplication.java,9\a\9a4f9c872e0e0f1caee69d2ba56186255a5901fa
-‘
-aproduct-services/src/main/java/com/mdonerprojects/productservices/ProductServicesApplication.java,c\a\ca5757e1a29eacbdf9c4a163bb14c9cd0c23d163
 j
 :api-gateway-services/.mvn/wrapper/maven-wrapper.properties,0\6\06057f9f2e639f759e4252fdd7bc5a29fcc8bcc5
 I
