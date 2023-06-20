@@ -5,6 +5,8 @@
     <file url="file://$PROJECT_DIR$/api-gateway-services/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/eureka-discovery-services/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/eureka-discovery-services/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/order-services/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/order-services/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/product-services/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/product-services/src/main/resources" charset="UTF-8" />
   </component>
