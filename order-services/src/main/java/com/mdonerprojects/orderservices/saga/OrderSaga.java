@@ -3,13 +3,17 @@ package com.mdonerprojects.orderservices.saga;
 
 import com.mdonerprojects.core.commands.ReserveProductCommand;
 import com.mdonerprojects.core.events.ProductReservedEvent;
+import com.mdonerprojects.core.query.FetchUserPaymentDetailsQuery;
 import com.mdonerprojects.orderservices.event.OrderCreatedEvent;
+import com.mdonerprojects.userservices.model.UserObj;
 import org.axonframework.commandhandling.CommandCallback;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.CommandResultMessage;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.StartSaga;
+import org.axonframework.queryhandling.QueryGateway;
 import org.axonframework.spring.stereotype.Saga;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,9 @@ import javax.annotation.Nonnull;
 public class OrderSaga {
     @Autowired
     private transient CommandGateway commandGateway;
+
+    @Autowired
+    private transient QueryGateway queryGateway;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderSaga.class);
 
@@ -36,27 +43,50 @@ public class OrderSaga {
                 .orderId(orderCreatedEvent.getOrderId())
                 .build();
 
-        LOGGER.info("OrderCreatedEvent handled for orderId:"+ reserveProductCommand.getOrderId() + " and productId:" + reserveProductCommand.getProductId());
+        LOGGER.info("OrderCreatedEvent handled for orderId:" + reserveProductCommand.getOrderId() + " and productId:" + reserveProductCommand.getProductId());
 
-            commandGateway.send(reserveProductCommand, new CommandCallback<ReserveProductCommand, Object>() {
+        commandGateway.send(reserveProductCommand, new CommandCallback<ReserveProductCommand, Object>() {
 
-                @Override
-                public void onResult(@Nonnull CommandMessage<? extends ReserveProductCommand> commandMessage, @Nonnull CommandResultMessage<?> commandResultMessage) {
-                    if(commandResultMessage.isExceptional()){
-                        // compensating queue start
-                    }
+            @Override
+            public void onResult(@Nonnull CommandMessage<? extends ReserveProductCommand> commandMessage, @Nonnull CommandResultMessage<?> commandResultMessage) {
+                if (commandResultMessage.isExceptional()) {
+                    // compensating queue start
                 }
-            });
+            }
+        });
 
     }
 
     @SagaEventHandler(associationProperty = "orderId")
-    public void handle(ProductReservedEvent productReservedEvent){
+    public void handle(ProductReservedEvent productReservedEvent) {
 
-        LOGGER.info("OrderCreatedEvent handled for orderId:"+ productReservedEvent.getOrderId() + " and productId:" + productReservedEvent.getProductId());
+        LOGGER.info("OrderCreatedEvent handled for orderId:" + productReservedEvent.getOrderId() + " and productId:" + productReservedEvent.getProductId());
 
         // process user payment
 
+        FetchUserPaymentDetailsQuery query = new FetchUserPaymentDetailsQuery();
+        query.setUserId(productReservedEvent.getUserId());
 
+
+        UserObj user = null;
+
+        try {
+            user = queryGateway.query(query,
+                    ResponseTypes.instanceOf(UserObj.class)).join();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+
+            // start compensating transaction
+            return;
+
+        }
+
+        if(user == null){
+            // start compensating transaction
+            return;
+
+        }
+
+        LOGGER.info("Successfully fetched user payment details for user:" + user.getUserId());
     }
 }
