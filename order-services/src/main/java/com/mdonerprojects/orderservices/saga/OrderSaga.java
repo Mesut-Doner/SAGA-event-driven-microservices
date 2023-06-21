@@ -1,11 +1,11 @@
 package com.mdonerprojects.orderservices.saga;
 
 
+import com.mdonerprojects.core.ProcessPaymentCommand;
 import com.mdonerprojects.core.commands.ReserveProductCommand;
 import com.mdonerprojects.core.events.ProductReservedEvent;
 import com.mdonerprojects.core.query.FetchUserPaymentDetailsQuery;
 import com.mdonerprojects.orderservices.event.OrderCreatedEvent;
-import com.mdonerprojects.userservices.model.UserObj;
 import org.axonframework.commandhandling.CommandCallback;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.CommandResultMessage;
@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Saga
 public class OrderSaga {
@@ -81,12 +83,32 @@ public class OrderSaga {
 
         }
 
-        if(user == null){
+        if (user == null) {
             // start compensating transaction
             return;
 
         }
 
         LOGGER.info("Successfully fetched user payment details for user:" + user.getUserId());
+
+        ProcessPaymentCommand processPaymentCommand = ProcessPaymentCommand
+                .builder()
+                .paymentId(UUID.randomUUID().toString())
+                .orderId(productReservedEvent.getOrderId())
+                .paymentDetails(user.getPaymentDetails())
+                .build();
+        String result = null;
+        try {
+            result = commandGateway.sendAndWait(processPaymentCommand, 10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            // start compensating transaction
+        }
+        if(result == null){
+            LOGGER.info("ProcessPaymentCommand result is null. Initiating a compensating tracsation.");
+            // start compensating transaction
+        }
+
+
     }
 }
