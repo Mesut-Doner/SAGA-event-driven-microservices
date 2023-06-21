@@ -1,5 +1,7 @@
 package com.mdonerprojects.productservices.aggregate;
 
+import com.mdonerprojects.core.commands.ReserveProductCommand;
+import com.mdonerprojects.core.events.ProductReservedEvent;
 import com.mdonerprojects.productservices.command.CreateProductCommand;
 import com.mdonerprojects.productservices.event.ProductCreatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
@@ -36,6 +38,29 @@ public class ProductAggregate {
         BeanUtils.copyProperties(createProductCommand, productCreatedEvent);
 
         AggregateLifecycle.apply(productCreatedEvent);
+    }
+
+    @CommandHandler
+    public void handle(ReserveProductCommand reserveProductCommand) {
+
+        if (quantity < reserveProductCommand.getQuantity()) {
+            throw new IllegalArgumentException("Stockta yok");
+        }
+
+        ProductReservedEvent productReservedEvent = ProductReservedEvent
+                .builder()
+                .orderId(reserveProductCommand.getOrderId())
+                .userId(reserveProductCommand.getUserId())
+                .productId(reserveProductCommand.getProductId())
+                .quantity(reserveProductCommand.getQuantity())
+                .build();
+
+        AggregateLifecycle.apply(productReservedEvent);
+    }
+
+    @EventSourcingHandler
+    public void on(ProductReservedEvent productReservedEvent) {
+        this.quantity = productReservedEvent.getQuantity();
     }
 
     @EventSourcingHandler
