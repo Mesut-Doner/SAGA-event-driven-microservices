@@ -4,6 +4,7 @@ package com.mdonerprojects.orderservices.saga;
 import com.mdonerprojects.core.ProcessPaymentCommand;
 import com.mdonerprojects.core.commands.ReserveProductCommand;
 import com.mdonerprojects.core.events.ProductReservedEvent;
+import com.mdonerprojects.core.model.UserObj;
 import com.mdonerprojects.core.query.FetchUserPaymentDetailsQuery;
 import com.mdonerprojects.orderservices.event.OrderCreatedEvent;
 import org.axonframework.commandhandling.CommandCallback;

@@ -2,8 +2,8 @@ package com.mdonerprojects.userservices.event.handler;
 
 
 import com.mdonerprojects.core.common.PaymentDetails;
+import com.mdonerprojects.core.model.UserObj;
 import com.mdonerprojects.core.query.FetchUserPaymentDetailsQuery;
-import com.mdonerprojects.userservices.model.UserObj;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 

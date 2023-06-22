@@ -1,5 +1,4 @@
-package com.mdonerprojects.userservices.model;
-
+package com.mdonerprojects.core.model;
 
 import com.mdonerprojects.core.common.PaymentDetails;
 import lombok.Builder;
