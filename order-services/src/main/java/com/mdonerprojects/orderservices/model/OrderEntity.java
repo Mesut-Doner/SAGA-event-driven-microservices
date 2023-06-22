@@ -1,17 +1,14 @@
 package com.mdonerprojects.orderservices.model;
 
 
-import com.mdonerprojects.orderservices.util.OrderStatus;
+import com.mdonerprojects.core.util.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.SerializationUtils;
-import org.axonframework.serialization.SerialVersionUIDRevisionResolver;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 @Entity
 @Data

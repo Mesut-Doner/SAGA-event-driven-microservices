@@ -1,7 +1,7 @@
 package com.mdonerprojects.orderservices.command;
 
 
-import com.mdonerprojects.orderservices.util.OrderStatus;
+import com.mdonerprojects.core.util.OrderStatus;
 import lombok.Builder;
 import lombok.Data;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;

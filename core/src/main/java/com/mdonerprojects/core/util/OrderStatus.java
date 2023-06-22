@@ -1,4 +1,4 @@
-package com.mdonerprojects.orderservices.util;
+package com.mdonerprojects.core.util;
 
 public enum OrderStatus {CREATED, APPROVED, REJECTED
 }

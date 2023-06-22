@@ -1,6 +1,7 @@
 package com.mdonerprojects.orderservices.event.handler;
 
 
+import com.mdonerprojects.core.events.OrderApprovedEvent;
 import com.mdonerprojects.orderservices.event.OrderCreatedEvent;
 import com.mdonerprojects.orderservices.model.OrderEntity;
 import com.mdonerprojects.orderservices.repository.OrderRepository;
@@ -39,6 +40,20 @@ public class OrderEventsHandler {
         OrderEntity orderEntity = new OrderEntity();
         BeanUtils.copyProperties(orderCreatedEvent, orderEntity);
 
+        orderRepository.save(orderEntity);
+
+    }
+    @EventHandler
+    public void on(OrderApprovedEvent orderApprovedEvent) {
+
+        OrderEntity orderEntity = orderRepository.findByOrderId(orderApprovedEvent.getOrderId());
+
+        if(orderEntity == null){
+            //log
+            return;
+        }
+
+        orderEntity.setOrderStatus(orderApprovedEvent.getOrderStatus());
         orderRepository.save(orderEntity);
 
     }

@@ -1,6 +1,6 @@
 package com.mdonerprojects.orderservices.event;
 
-import com.mdonerprojects.orderservices.util.OrderStatus;
+import com.mdonerprojects.core.util.OrderStatus;
 import lombok.Data;
 
 

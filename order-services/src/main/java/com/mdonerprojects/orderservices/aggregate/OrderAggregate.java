@@ -1,8 +1,10 @@
 package com.mdonerprojects.orderservices.aggregate;
 
+import com.mdonerprojects.core.events.OrderApprovedEvent;
+import com.mdonerprojects.core.util.OrderStatus;
+import com.mdonerprojects.orderservices.command.ApproveOrderCommand;
 import com.mdonerprojects.orderservices.command.CreateOrderCommand;
 import com.mdonerprojects.orderservices.event.OrderCreatedEvent;
-import com.mdonerprojects.orderservices.util.OrderStatus;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -41,5 +43,21 @@ public class OrderAggregate {
         this.addressId = orderCreatedEvent.getAddressId();
         this.orderStatus = orderCreatedEvent.getOrderStatus();
         this.quantity = orderCreatedEvent.getQuantity();
+    }
+
+
+    @CommandHandler
+    public void handle(ApproveOrderCommand approveOrderCommand) {
+        //create and publish orderapprovedEvent
+        OrderApprovedEvent orderApprovedEvent = OrderApprovedEvent
+                .builder()
+                .orderId(approveOrderCommand.getOrderId())
+                .build();
+        AggregateLifecycle.apply(orderApprovedEvent);
+    }
+
+    @EventSourcingHandler
+    public void on(OrderApprovedEvent orderApprovedEvent) {
+        this.orderStatus = orderApprovedEvent.getOrderStatus();
     }
 }
