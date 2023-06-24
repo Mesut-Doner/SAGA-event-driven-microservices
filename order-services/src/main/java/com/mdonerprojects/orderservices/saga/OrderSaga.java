@@ -14,6 +14,8 @@ import com.mdonerprojects.orderservices.command.ApproveOrderCommand;
 import com.mdonerprojects.orderservices.command.RejectOrderCommand;
 import com.mdonerprojects.orderservices.event.OrderCreatedEvent;
 import com.mdonerprojects.orderservices.event.OrderRejectedEvent;
+import com.mdonerprojects.orderservices.model.OrderSummary;
+import com.mdonerprojects.orderservices.query.FindOrderQuery;
 import org.axonframework.commandhandling.CommandCallback;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.CommandResultMessage;
@@ -25,6 +27,7 @@ import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.queryhandling.QueryGateway;
+import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.axonframework.spring.stereotype.Saga;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +49,9 @@ public class OrderSaga {
 
     @Autowired
     private transient DeadlineManager deadlineManager;
+
+    @Autowired
+    private transient QueryUpdateEmitter queryUpdateEmitter;
 
     private String scheduleId;
 
@@ -165,6 +171,8 @@ public class OrderSaga {
     public void handle(OrderApprovedEvent orderApprovedEvent) {
         LOGGER.info("Order is approved. Order saga is completed for orderId:" + orderApprovedEvent.getOrderId());
         //SagaLifecycle.end();
+        queryUpdateEmitter.emit(FindOrderQuery.class, findOrderQuery -> true,
+                new OrderSummary(orderApprovedEvent.getOrderId(), orderApprovedEvent.getOrderStatus(), ""));
 
     }
 
@@ -201,6 +209,8 @@ public class OrderSaga {
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(OrderRejectedEvent orderRejectedEvent) {
         LOGGER.info("Successfully Rejected Order:" + orderRejectedEvent.getOrderId());
+        queryUpdateEmitter.emit(FindOrderQuery.class, findOrderQuery -> true,
+                new OrderSummary(orderRejectedEvent.getOrderId(), orderRejectedEvent.getOrderStatus(), orderRejectedEvent.getReason()));
 
     }
 
