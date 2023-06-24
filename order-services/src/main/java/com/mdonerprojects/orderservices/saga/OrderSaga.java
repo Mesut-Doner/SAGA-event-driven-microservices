@@ -18,6 +18,8 @@ import org.axonframework.commandhandling.CommandCallback;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.CommandResultMessage;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.deadline.DeadlineManager;
+import org.axonframework.deadline.annotation.DeadlineHandler;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
@@ -29,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +43,11 @@ public class OrderSaga {
 
     @Autowired
     private transient QueryGateway queryGateway;
+
+    @Autowired
+    private transient DeadlineManager deadlineManager;
+
+    private String scheduleId;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderSaga.class);
 
@@ -102,6 +111,9 @@ public class OrderSaga {
 
         LOGGER.info("Successfully fetched user payment details for user:" + user.getUserId());
 
+        scheduleId = deadlineManager.schedule(Duration.of(10, ChronoUnit.SECONDS),
+                "payment-processing-deadline", productReservedEvent);
+
         ProcessPaymentCommand processPaymentCommand = ProcessPaymentCommand
                 .builder()
                 .paymentId(UUID.randomUUID().toString())
@@ -128,6 +140,7 @@ public class OrderSaga {
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(PaymentProcessedEvent paymentProcessedEvent) {
 
+        cancelDeadlines();
         // send approveordercommand
         ApproveOrderCommand approveOrderCommand = new ApproveOrderCommand(paymentProcessedEvent.getOrderId());
 
@@ -139,6 +152,14 @@ public class OrderSaga {
 
     }
 
+    private void cancelDeadlines() {
+        if (scheduleId == null) {
+            return;
+        }
+        deadlineManager.cancelSchedule("payment-processing-deadline", scheduleId);
+        scheduleId = null;
+    }
+
     @SagaEventHandler(associationProperty = "orderId")
     @EndSaga
     public void handle(OrderApprovedEvent orderApprovedEvent) {
@@ -148,6 +169,7 @@ public class OrderSaga {
     }
 
     private void cancelProductResevartion(ProductReservedEvent productReservedEvent, String reason) {
+        cancelDeadlines();
         CancelProductReservationCommand cancelProductReservationCommand
                 = CancelProductReservationCommand
                 .builder()
@@ -182,5 +204,9 @@ public class OrderSaga {
 
     }
 
-
+    @DeadlineHandler(deadlineName = "payment-processing-deadline")
+    public void handleDeadline(ProductReservedEvent productReservedEvent) {
+        LOGGER.info("Payment processing deadline took place");
+        cancelProductResevartion(productReservedEvent, "Payment timeout");
+    }
 }
