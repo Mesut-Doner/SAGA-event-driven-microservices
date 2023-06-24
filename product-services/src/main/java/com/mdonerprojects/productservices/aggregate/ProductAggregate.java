@@ -1,6 +1,8 @@
 package com.mdonerprojects.productservices.aggregate;
 
+import com.mdonerprojects.core.commands.CancelProductReservationCommand;
 import com.mdonerprojects.core.commands.ReserveProductCommand;
+import com.mdonerprojects.core.events.ProductReservationCancelledEvent;
 import com.mdonerprojects.core.events.ProductReservedEvent;
 import com.mdonerprojects.productservices.command.CreateProductCommand;
 import com.mdonerprojects.productservices.event.ProductCreatedEvent;
@@ -58,6 +60,22 @@ public class ProductAggregate {
         AggregateLifecycle.apply(productReservedEvent);
     }
 
+    @CommandHandler
+    public void handle(CancelProductReservationCommand cancelProductReservationCommand) {
+        ProductReservationCancelledEvent productReservationCancelledEvent =
+                ProductReservationCancelledEvent
+                        .builder()
+                        .reason(cancelProductReservationCommand.getReason())
+                        .userId(cancelProductReservationCommand.getUserId())
+                        .productId(cancelProductReservationCommand.getProductId())
+                        .quantity(cancelProductReservationCommand.getQuantity())
+                        .orderId(cancelProductReservationCommand.getOrderId())
+                        .build();
+        AggregateLifecycle.apply(productReservationCancelledEvent);
+
+
+    }
+
     @EventSourcingHandler
     public void on(ProductReservedEvent productReservedEvent) {
         this.quantity = productReservedEvent.getQuantity();
@@ -69,5 +87,11 @@ public class ProductAggregate {
         this.title = productCreatedEvent.getTitle();
         this.price = productCreatedEvent.getPrice();
         this.quantity = productCreatedEvent.getQuantity();
+    }
+
+    @EventSourcingHandler
+    public void on(ProductReservationCancelledEvent productReservationCancelledEvent) {
+        this.quantity += productReservationCancelledEvent.getQuantity();
+
     }
 }

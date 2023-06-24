@@ -3,6 +3,7 @@ package com.mdonerprojects.orderservices.event.handler;
 
 import com.mdonerprojects.core.events.OrderApprovedEvent;
 import com.mdonerprojects.orderservices.event.OrderCreatedEvent;
+import com.mdonerprojects.orderservices.event.OrderRejectedEvent;
 import com.mdonerprojects.orderservices.model.OrderEntity;
 import com.mdonerprojects.orderservices.repository.OrderRepository;
 import org.axonframework.config.ProcessingGroup;
@@ -56,5 +57,18 @@ public class OrderEventsHandler {
         orderEntity.setOrderStatus(orderApprovedEvent.getOrderStatus());
         orderRepository.save(orderEntity);
 
+    }
+
+    @EventHandler
+    public void on(OrderRejectedEvent orderRejectedEvent) {
+        OrderEntity orderEntity = orderRepository.findByOrderId(orderRejectedEvent.getOrderId());
+
+        if(orderEntity == null){
+            //log
+            return;
+        }
+
+        orderEntity.setOrderStatus(orderRejectedEvent.getOrderStatus());
+        orderRepository.save(orderEntity);
     }
 }

@@ -1,5 +1,6 @@
 package com.mdonerprojects.productservices.event.handler;
 
+import com.mdonerprojects.core.events.ProductReservationCancelledEvent;
 import com.mdonerprojects.core.events.ProductReservedEvent;
 import com.mdonerprojects.productservices.event.ProductCreatedEvent;
 import com.mdonerprojects.productservices.model.ProductEntity;
@@ -52,7 +53,16 @@ public class ProductEventsHandler {
         ProductEntity productEntity = productRepository.findByProductId(productReservedEvent.getProductId());
         productEntity.setQuantity(productEntity.getQuantity() - productReservedEvent.getQuantity());
         productRepository.save(productEntity);
-
+    }
+    @EventHandler
+    public void on(ProductReservationCancelledEvent productReservationCancelledEvent) {
+        LOGGER.info("ProductReservationCancelledEvent handled for orderId:"+
+                productReservationCancelledEvent.getOrderId() + " and productId:" +
+                productReservationCancelledEvent.getProductId());
+        ProductEntity productEntity = productRepository
+                .findByProductId(productReservationCancelledEvent.getProductId());
+        productEntity.setQuantity(productEntity.getQuantity()+productReservationCancelledEvent.getQuantity());
+        productRepository.save(productEntity);
 
     }
 }

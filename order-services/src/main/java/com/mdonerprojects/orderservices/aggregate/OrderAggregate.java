@@ -4,7 +4,9 @@ import com.mdonerprojects.core.events.OrderApprovedEvent;
 import com.mdonerprojects.core.util.OrderStatus;
 import com.mdonerprojects.orderservices.command.ApproveOrderCommand;
 import com.mdonerprojects.orderservices.command.CreateOrderCommand;
+import com.mdonerprojects.orderservices.command.RejectOrderCommand;
 import com.mdonerprojects.orderservices.event.OrderCreatedEvent;
+import com.mdonerprojects.orderservices.event.OrderRejectedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -54,6 +56,22 @@ public class OrderAggregate {
                 .orderId(approveOrderCommand.getOrderId())
                 .build();
         AggregateLifecycle.apply(orderApprovedEvent);
+    }
+
+    @CommandHandler
+    public void handle(RejectOrderCommand rejectOrderCommand) {
+        //create and publish orderrejectedEvent
+        OrderRejectedEvent orderRejectedEvent = OrderRejectedEvent
+                .builder()
+                .orderId(rejectOrderCommand.getOrderId())
+                .reason(rejectOrderCommand.getReason())
+                .build();
+        AggregateLifecycle.apply(orderRejectedEvent);
+    }
+
+    @EventSourcingHandler
+    public void on(OrderRejectedEvent orderRejectedEvent) {
+        this.orderStatus = orderRejectedEvent.getOrderStatus();
     }
 
     @EventSourcingHandler
